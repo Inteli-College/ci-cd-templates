@@ -25,7 +25,7 @@ jobs:
           DATE_SOURCE_URL: ${{ secrets.DATE_SOURCE_URL }}
 
       - name: Executar validações
-        run: python cursos/sistemas/informacao/M07/scripts/run_validations.py
+        run: python cursos/sistemas-informacao/M07/scripts/run_validations.py
 
       - name: Postar resultado no Slack
         run: python shared/post_slack.py
