@@ -8,8 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout código do repositório atual
         uses: actions/checkout@v3
+        
+      - name: Checkout dos templates CI/CD
+        uses: actions/checkout@v3
+        with:
+          repository: Inteli-College/ci-cd-templates
+          path: ci-cd-templates
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -17,17 +23,17 @@ jobs:
           python-version: '3.11'
 
       - name: Instalar dependências
-        run: pip install -r shared/requirements.txt
+        run: pip install -r ci-cd-templates/shared/requirements.txt
 
       - name: Verificar data de execução
-        run: python shared/check_date.py
+        run: python ci-cd-templates/shared/check_date.py
         env:
           DATE_SOURCE_URL: ${{ secrets.DATE_SOURCE_URL }}
 
       - name: Executar validações
-        run: python cursos/sistemas-informacao/M07/scripts/run_validations.py
+        run: python ci-cd-templates/cursos/sistemas-informacao/M07/scripts/run_validations.py
 
       - name: Postar resultado no Slack
-        run: python shared/post_slack.py
+        run: python ci-cd-templates/shared/post_slack.py
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
