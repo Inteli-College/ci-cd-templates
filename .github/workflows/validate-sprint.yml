@@ -1,0 +1,33 @@
+name: Validate Sprint
+
+on:
+  workflow_call:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install -r shared/requirements.txt
+
+      - name: Verificar data de execução
+        run: python shared/check_date.py
+        env:
+          DATE_SOURCE_URL: ${{ secrets.DATE_SOURCE_URL }}
+
+      - name: Executar validações
+        run: python cursos/sistemas-informacao/M07/scripts/run_validations.py
+
+      - name: Postar resultado no Slack
+        run: python shared/post_slack.py
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

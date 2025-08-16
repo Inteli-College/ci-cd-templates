@@ -1,1 +1,11 @@
 # Workflow de avaliação manual
+
+name: Avaliação Manual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-validation:
+    uses: ./.github/workflows/validate-sprint.yml
+    secrets: inherit
