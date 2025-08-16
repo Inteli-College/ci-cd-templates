@@ -31,18 +31,18 @@ jobs:
       - name: Verificar data de execução
         run: |
           cd ci-cd-templates
-          python shared/check_date.py
+          PYTHONPATH=. python shared/check_date.py
         env:
           DATE_SOURCE_URL: ${{ secrets.DATE_SOURCE_URL }}
 
       - name: Executar validações
         run: |
           cd ci-cd-templates
-          python cursos/sistemas-informacao/M07/scripts/run_validations.py
+          PYTHONPATH=. python cursos/sistemas-informacao/M07/scripts/run_validations.py
 
       - name: Postar resultado no Slack
         run: |
           cd ci-cd-templates
-          python shared/post_slack.py
+          PYTHONPATH=. python shared/post_slack.py
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
