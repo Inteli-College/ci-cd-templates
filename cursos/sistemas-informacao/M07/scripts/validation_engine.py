@@ -236,6 +236,37 @@ class ValidationEngine:
         
         return report
     
+    def generate_detailed_report_text(self):
+        """Gera relatório detalhado como texto formatado (igual ao que é impresso)"""
+        report = self.generate_report()
+        
+        lines = []
+        lines.append("=" * 50)
+        lines.append("📊 RESUMO DAS VALIDAÇÕES")
+        lines.append("=" * 50)
+        lines.append(f"Total: {report['summary']['total']}")
+        lines.append(f"✅ Passou: {report['summary']['passed']}")
+        lines.append(f"❌ Falhou: {report['summary']['failed']}")
+        lines.append(f"📈 Taxa de sucesso: {report['summary']['success_rate']:.1f}%")
+        
+        lines.append("")
+        lines.append("-" * 50)
+        lines.append("📋 DETALHES")
+        lines.append("-" * 50)
+        
+        for result in self.results:
+            lines.append(f"{result['message']}")
+            
+            # Mostra detalhes de validações de conteúdo
+            if 'validations' in result:
+                for validation in result['validations']:
+                    lines.append(f"   └─ {validation['message']}")
+        
+        lines.append("")
+        lines.append("=" * 50)
+        
+        return "\n".join(lines)
+    
     def print_results(self):
         """Imprime resultados das validações"""
         report = self.generate_report()
@@ -282,13 +313,19 @@ def main():
         
         # Salvar resultados para compatibilidade com sistema de notificações
         report = engine.generate_report()
+        detailed_text = engine.generate_detailed_report_text()
+        
         with open("results.json", "w", encoding="utf-8") as f:
             json.dump({
+                "config_name": report['config'].get('name', 'Validação'),
+                "config_description": report['config'].get('description', ''),
                 "summary": f"{report['summary']['passed']}/{report['summary']['total']} validações passaram",
                 "status": "success" if exit_code == 0 else "failed",
                 "details": report['details'],
                 "config": report['config'],
-                "success_rate": report['summary']['success_rate']
+                "success_rate": report['summary']['success_rate'],
+                "detailed_report": detailed_text,
+                "summary_stats": report['summary']
             }, f, indent=2, ensure_ascii=False)
         
         return exit_code
