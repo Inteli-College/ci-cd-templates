@@ -7,6 +7,7 @@ import yaml
 import os
 import requests
 import subprocess
+import json
 from pathlib import Path
 from shared.utils.file_checks import file_exists, folder_exists
 from shared.utils.formatting import format_validation_result
@@ -280,6 +281,17 @@ def main():
         engine = ValidationEngine(config_path)
         engine.run_all_validations()
         exit_code = engine.print_results()
+        
+        # Salvar resultados para compatibilidade com sistema de notificações
+        report = engine.generate_report()
+        with open("results.json", "w", encoding="utf-8") as f:
+            json.dump({
+                "summary": f"{report['summary']['passed']}/{report['summary']['total']} validações passaram",
+                "status": "success" if exit_code == 0 else "failed",
+                "details": report['details'],
+                "config": report['config'],
+                "success_rate": report['summary']['success_rate']
+            }, f, indent=2, ensure_ascii=False)
         
         return exit_code
         
