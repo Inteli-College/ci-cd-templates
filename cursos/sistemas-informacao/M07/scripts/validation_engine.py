@@ -10,8 +10,6 @@ import subprocess
 import json
 from pathlib import Path
 from shared.utils.file_checks import file_exists, folder_exists
-from shared.utils.formatting import format_validation_result
-from shared.utils.slack_format import format_slack_message
 
 class ValidationEngine:
     def __init__(self, config_path):

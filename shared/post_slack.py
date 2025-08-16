@@ -48,14 +48,18 @@ def main():
         results = load_validation_results()
         payload = format_message(results)
         
+        print(f"📤 Enviando notificação para o Slack...")
         response = requests.post(webhook_url, json=payload, timeout=10)
         if response.status_code == 200:
             print("✅ Notificação enviada para o Slack com sucesso")
         else:
-            print(f"❌ Erro ao enviar notificação: {response.status_code}")
+            print(f"❌ Erro ao enviar notificação: HTTP {response.status_code}")
+            print(f"Response: {response.text}")
             
     except Exception as e:
         print(f"❌ Erro ao enviar notificação para o Slack: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
