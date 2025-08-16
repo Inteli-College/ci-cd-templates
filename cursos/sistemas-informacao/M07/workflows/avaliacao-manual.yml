@@ -4,8 +4,32 @@ name: Avaliação Manual
 
 on:
   workflow_dispatch:
+    inputs:
+      config_path:
+        description: 'Caminho do arquivo de configuração YAML'
+        required: false
+        default: 'cursos/sistemas-informacao/M07/config/validation-config.yml'
+      module:
+        description: 'Módulo (M01-M12)'
+        required: false
+        default: 'M07'
+      course:
+        description: 'Curso'
+        required: false
+        default: 'sistemas-informacao'
+        type: choice
+        options:
+        - sistemas-informacao
+        - engenharia-software
+        - engenharia-computacao
+        - ciencia-computacao
+        - adm-tech
 
 jobs:
   call-validation:
     uses: ./.github/workflows/validate-sprint.yml
+    with:
+      config_path: ${{ inputs.config_path }}
+      module: ${{ inputs.module }}
+      course: ${{ inputs.course }}
     secrets: inherit

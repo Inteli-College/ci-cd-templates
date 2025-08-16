@@ -1,7 +1,23 @@
-name: Validate Sprint
+name: Validate Sprint - Configurável
 
 on:
   workflow_call:
+    inputs:
+      config_path:
+        description: 'Caminho para o arquivo de configuração YAML'
+        required: false
+        type: string
+        default: 'cursos/sistemas-informacao/M07/config/validation-config.yml'
+      module:
+        description: 'Módulo a ser validado (M01-M12)'
+        required: false
+        type: string
+        default: 'M07'
+      course:
+        description: 'Curso a ser validado'
+        required: false
+        type: string
+        default: 'sistemas-informacao'
 
 jobs:
   validate:
@@ -28,21 +44,33 @@ jobs:
       - name: Instalar dependências
         run: pip install -r ci-cd-templates/shared/requirements.txt
 
-      - name: Verificar data de execução
+      - name: Verificar arquivo de configuração
         run: |
           cd ci-cd-templates
-          PYTHONPATH=. python shared/check_date.py
-        env:
-          DATE_SOURCE_URL: ${{ secrets.DATE_SOURCE_URL }}
+          CONFIG_PATH="${{ inputs.config_path }}"
+          echo "📋 Usando configuração: $CONFIG_PATH"
+          
+          if [ ! -f "$CONFIG_PATH" ]; then
+            echo "❌ Arquivo de configuração não encontrado: $CONFIG_PATH"
+            echo "🔧 Criando configuração padrão para ${{ inputs.course }}/${{ inputs.module }}"
+            
+            # Criar configuração usando template se não existir
+            mkdir -p $(dirname "$CONFIG_PATH")
+            PYTHONPATH=. python shared/utils/create_default_config.py "$CONFIG_PATH" "${{ inputs.course }}" "${{ inputs.module }}"
+          else
+            echo "✅ Arquivo de configuração encontrado"
+          fi
 
-      - name: Executar validações
+      - name: Executar validações configuráveis
         run: |
           cd ci-cd-templates
-          PYTHONPATH=. python cursos/sistemas-informacao/M07/scripts/run_validations.py
+          PYTHONPATH=. VALIDATION_CONFIG="${{ inputs.config_path }}" python cursos/sistemas-informacao/M07/scripts/validation_engine.py
 
-      - name: Postar resultado no Slack
+      - name: Postar resultado no Slack (se configurado)
+        if: always()
         run: |
           cd ci-cd-templates
-          PYTHONPATH=. python shared/post_slack.py
+          echo "📢 Enviando notificação para o Slack (se configurado)"
+          PYTHONPATH=. VALIDATION_CONFIG="${{ inputs.config_path }}" python shared/post_slack.py
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

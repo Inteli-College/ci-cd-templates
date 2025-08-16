@@ -1,0 +1,75 @@
+name: "Validação M07 - Sistemas de Informação"
+description: "Configuração de validações para entrega do módulo 7"
+
+validations:
+  folders:
+    - path: "src"
+      required: true
+      description: "Pasta principal do código fonte"
+    
+    - path: "src/backend"
+      required: true
+      description: "Pasta do backend da aplicação"
+    
+    - path: "src/frontend"
+      required: true
+      description: "Pasta do frontend da aplicação"
+    
+    - path: "docs"
+      required: true
+      description: "Pasta de documentação"
+
+  files:
+    - path: "README.md"
+      required: true
+      description: "Arquivo README principal"
+      validations:
+        - type: "content_contains"
+          value: "# "
+          description: "Deve conter pelo menos um título"
+        - type: "min_lines"
+          value: 10
+          description: "Deve ter pelo menos 10 linhas"
+    
+    - path: "docs/README.md"
+      required: true
+      description: "README da documentação"
+    
+    - path: ".gitignore"
+      required: true
+      description: "Arquivo gitignore"
+    
+    - path: "requirements.txt"
+      required: false
+      description: "Dependências Python (se aplicável)"
+
+  api_checks:
+    - url: "http://localhost:5000/health"
+      required: false
+      method: "GET"
+      description: "Health check do backend"
+      expected_status: 200
+    
+    - url: "http://localhost:3000"
+      required: false
+      method: "GET"
+      description: "Frontend acessível"
+      expected_status: 200
+
+  custom_scripts:
+    - name: "test_database_connection"
+      script: "python tests/test_db.py"
+      required: false
+      description: "Teste de conexão com banco de dados"
+    
+    - name: "lint_check"
+      script: "flake8 src/"
+      required: false
+      description: "Verificação de qualidade do código Python"
+
+notification:
+  slack:
+    enabled: true
+    channel: "#entregas-m07"
+    mention_on_failure: true
+    users_to_mention: ["@professor", "@monitor"]

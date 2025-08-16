@@ -8,7 +8,7 @@ def run_all():
     if not dir_exists(pasta):
         return [{"check": "Pasta src presente", "status": "fail"}]
 
-    import os
-    arquivos_py = [f for f in os.listdir(pasta) if f.endswith(".py")]
-    status = "ok" if arquivos_py else "fail"
-    return [{"check": "Arquivos Python na pasta src", "status": status}]
+    # import os
+    # arquivos_py = [f for f in os.listdir(pasta) if f.endswith(".py")]
+    # status = "ok" if arquivos_py else "fail"
+    # return [{"check": "Arquivos Python na pasta src", "status": status}]

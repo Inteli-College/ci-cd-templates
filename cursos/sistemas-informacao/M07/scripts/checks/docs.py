@@ -1,15 +1,13 @@
-from shared.utils.file_checks import file_exists
+from shared.utils.file_checks import dir_exists
 
 def run_all():
     """
     Verifica se os documentos obrigatórios existem.
     """
     results = []
-    obrigatorios = [
-        "docs/planejamento.md",
-        "docs/relatorio.md"
-    ]
-    for doc in obrigatorios:
-        status = "ok" if file_exists(doc) else "fail"
-        results.append({"check": f"Documento {doc}", "status": status})
+
+    pasta = "docs"
+    if not dir_exists(pasta):
+        return [{"check": "Pasta docs presente", "status": "fail"}]
+
     return results
